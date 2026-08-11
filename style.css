@@ -38,7 +38,7 @@ body {
 }
 
 /* =========================================================
-   PÁGINAS DE ACCESO (LOGIN / REGISTRO / CONTENEDORES)
+   PÁGINAS DE ACCESO (LOGIN / REGISTRO / PORTADA)
 ========================================================= */
 .contenedor {
     width: 420px;
@@ -76,6 +76,7 @@ body {
     font-weight: 500;
 }
 
+.contenedor input[type="email"],
 .contenedor input[type="text"],
 .contenedor input[type="password"] {
     width: 100%;
@@ -107,6 +108,37 @@ body {
 
 .contenedor button[type="submit"]:hover {
     background: var(--primary-hover);
+}
+
+/* BOTONES DE LA PORTADA (INDEX.HTML) */
+.botones {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 15px;
+    position: relative;
+    z-index: 10;
+}
+
+.botones a.btn {
+    display: inline-block;
+    flex: 1;
+    text-decoration: none;
+    padding: 12px 20px;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    pointer-events: auto !important;
+    text-align: center;
+}
+
+.botones a.btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
 .contenedor a {
@@ -145,20 +177,11 @@ body {
 
 .menu-retos {
     display: flex;
-    flex-wrap: wrap; /* Permite que los botones bajen a la siguiente fila */
+    flex-wrap: wrap;
     gap: 6px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
     flex: 1;
-}
-
-.menu-retos::-webkit-scrollbar {
-    height: 4px;
-}
-
-.menu-retos::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 4px;
 }
 
 .menu-retos a {
@@ -197,6 +220,7 @@ body {
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
+    cursor: pointer;
     transition: background 0.2s;
 }
 
@@ -235,8 +259,6 @@ body {
     height: 90px;
     width: auto;
     border-radius: 12px;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
     object-fit: contain;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
@@ -258,7 +280,6 @@ body {
     font-size: 14px;
 }
 
-/* TAMAÑO Y ALINEACIÓN DE LOS ESCUDOS */
 .titulo-reto h1 img,
 img.escudo-reto {
     height: 50px !important;
@@ -299,7 +320,7 @@ img.escudo-reto {
 }
 
 /* =========================================================
-   TABLAS Y CAMPOS DE EDICIÓN (Ajuste exacto al ancho de pantalla)
+   TABLAS Y CAMPOS DE EDICIÓN
 ========================================================= */
 .seccion {
     background: var(--bg-card);
@@ -318,12 +339,11 @@ img.escudo-reto {
 
 .tabla-contenedor {
     width: 100%;
-    overflow-x: hidden; /* Oculta la barra de scroll horizontal */
+    overflow-x: auto; /* Muestra scroll suave en pantallas pequeñas sin deformar campos */
 }
 
 table {
     width: 100%;
-    table-layout: fixed; /* Fuerza a la tabla a no superar el 100% de ancho */
     border-collapse: separate;
     border-spacing: 0;
     margin-top: 8px;
@@ -336,11 +356,9 @@ th {
     text-transform: uppercase;
     font-size: 11px;
     letter-spacing: 0.5px;
-    padding: 10px 4px;
+    padding: 10px 6px;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -381,15 +399,13 @@ button.guardar,
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 6px 2px;
+    padding: 7px 4px;
     border-radius: var(--radius-sm);
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 button.guardar:hover,
@@ -435,9 +451,9 @@ button.guardar:hover,
 .tarjeta-reto {
     display: block;
     text-decoration: none;
-    color: var(--text-main, #ffffff);
-    background: var(--bg-card, #1e293b);
-    border: 2px solid var(--border-color, #334155);
+    color: var(--text-main);
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     padding: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -462,7 +478,7 @@ button.guardar:hover,
     color: inherit;
 }
 
-/* Colores de estado */
+/* Colores de estado para los retos */
 .tarjeta-reto.reto-completado {
     background-color: #064e3b !important;
     border-color: #10b981 !important;
@@ -474,6 +490,6 @@ button.guardar:hover,
 }
 
 .tarjeta-reto.reto-en-curso {
-    background-color: var(--bg-card, #1e293b);
-    border-color: var(--border-color, #334155);
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
 }

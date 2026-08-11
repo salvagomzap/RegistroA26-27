@@ -3,38 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión</title>
+    <title>Iniciar sesión - Registro de Apuestas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="contenedor">
         <h1>Iniciar sesión</h1>
         <p>Introduce tus datos para entrar.</p>
+        
         <form id="form-login">
-            <label for="usuario">Usuario</label>
-            <input
-                type="text"
-                id="usuario"
-                placeholder="Introduce tu usuario"
-                required
-            >
-            <label for="password">Contraseña</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Introduce tu contraseña"
-                required
-            >
-            <button type="submit">
-                Iniciar sesión
-            </button>
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Iniciar sesión</button>
         </form>
+
         <p>
             ¿No tienes una cuenta?
             <a href="registro.html">Crear cuenta</a>
         </p>
         <a href="index.html">Volver al inicio</a>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Se añade type="module" obligatorio para Firebase -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
