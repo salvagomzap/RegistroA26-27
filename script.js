@@ -17,7 +17,7 @@ import {
    CONFIGURACIÓN E INICIALIZACIÓN DE FIREBASE
 ========================================================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyCnpkG7CpWhUJBabiirGpTbVm2Q3maK2Bw",
+  apiKey: "AIzaSyCnpkG7Cpm4u_6xblirGpTbVm2Q3maK2Bw",
   authDomain: "registro-apuestas-6bec2.firebaseapp.com",
   projectId: "registro-apuestas-6bec2",
   storageBucket: "registro-apuestas-6bec2.firebasestorage.app",
