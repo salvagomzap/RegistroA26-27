@@ -381,6 +381,7 @@ async function renderizarTarjetasPanel() {
   if (!contenedor) return;
 
   contenedor.innerHTML = "";
+  let sumaTotalEnCurso = 0;
 
   for (const reto of listaRetosPanel) {
     const totalFilas = tablasFijas[reto.id] || 1;
@@ -390,6 +391,7 @@ async function renderizarTarjetasPanel() {
     let estadoFila = "EN CURSO";
     let claseEstado = "reto-en-curso";
     let premioTexto = "-";
+    let premioNum = 0;
 
     if (numeros.length > 0) {
       if (reto.id === "tabla-apuestas1") {
@@ -400,6 +402,7 @@ async function renderizarTarjetasPanel() {
         estadoFila = "EN CURSO";
         claseEstado = "reto-en-curso";
         premioTexto = formatoEuros(totalObtenido);
+        premioNum = totalObtenido;
       } else {
         const ultimoNum = numeros[numeros.length - 1];
         const ultimaFila = datos[ultimoNum];
@@ -416,8 +419,13 @@ async function renderizarTarjetasPanel() {
           estadoFila = "EN CURSO";
           claseEstado = "reto-en-curso";
           premioTexto = formatoEuros(ultimaFila.obtenido);
+          premioNum = parseFloat(ultimaFila.obtenido) || 0;
         }
       }
+    }
+
+    if (estadoFila === "EN CURSO") {
+      sumaTotalEnCurso += premioNum;
     }
 
     const card = document.createElement("a");
@@ -431,6 +439,12 @@ async function renderizarTarjetasPanel() {
       </div>
     `;
     contenedor.appendChild(card);
+  }
+
+  // Actualiza la tarjeta superior con la suma de todos los retos en curso
+  const elementoTotal = document.getElementById("total-dinero-curso");
+  if (elementoTotal) {
+    elementoTotal.textContent = formatoEuros(sumaTotalEnCurso);
   }
 }
 
