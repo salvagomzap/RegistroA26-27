@@ -43,7 +43,8 @@ const tablasFijas = {
   "tabla-jornadas-eliminatorias": 11,
   "tabla-tenis": 21,
   "tabla-nba": 17,
-  "tabla-partidos": 17
+  "tabla-partidos": 17,
+  "tabla-aumentos": 8
 };
 
 const prefijosFijos = {
@@ -370,6 +371,7 @@ const listaRetosPanel = [
   { id: "tabla-jornadas-premier", nombre: "PREMIER LEAGUE", enlace: "premier.html" },
   { id: "tabla-jornadas-grupos", nombre: "FASE GRUPOS CHAMPIONS", enlace: "gruposchampions.html" },
   { id: "tabla-jornadas-eliminatorias", nombre: "ELIMINATORIAS CHAMPIONS", enlace: "eliminatoriaschampions.html" },
+  { id: "tabla-aumentos", nombre: "RETO AUMENTOS", enlace: "aumentos.html" },
   { id: "tabla-tenis", nombre: "TENIS", enlace: "tenis.html" },
   { id: "tabla-nba", nombre: "PLAY OFF NBA", enlace: "nba.html" },
   { id: "tabla-partidos", nombre: "PARTIDOS ESPECIALES", enlace: "partidos.html" },
