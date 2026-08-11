@@ -461,13 +461,17 @@ document.querySelectorAll("table").forEach(function (tabla) {
 document.querySelectorAll(".boton-principal[data-tabla]").forEach(function (boton) {
   boton.addEventListener("click", async function () {
     const id = boton.dataset.tabla;
-    await anadirFilaAbierta(id);
-    await cargarDatos(id);
-  });
-});
-
-document.querySelectorAll(".boton-principal[data-tabla]").forEach(function (boton) {
-  boton.addEventListener("click", function () {
-    anadirFilaAbierta(boton.dataset.tabla);
+    const tbody = document.getElementById(id);
+    if (!tbody) return;
+    
+    const nuevoNumero = tbody.querySelectorAll("tr").length + 1;
+    crearFila(tbody, nuevoNumero, "P", false);
+    
+    const user = auth.currentUser;
+    if (user) {
+      const datos = await obtenerDatosTabla(id);
+      const docRef = doc(db, "usuarios", user.uid, "tablas", id);
+      await setDoc(docRef, { filas: datos }, { merge: true });
+    }
   });
 });
