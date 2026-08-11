@@ -241,7 +241,13 @@ async function crearTablaFija(id, total) {
   tbody.innerHTML = "";
   const conRonda = id === "tabla-jornadas-eliminatorias";
   const prefijo = prefijosFijos[id] || "J";
-  for (let i = 1; i <= total; i++) crearFila(tbody, i, prefijo, conRonda);
+  
+  // 1. Creamos las filas vacías
+  for (let i = 1; i <= total; i++) {
+    crearFila(tbody, i, prefijo, conRonda);
+  }
+  
+  // 2. Cargamos los datos reales desde la nube inmediatamente después
   await cargarDatos(id);
   await actualizarResumen(id);
 }
