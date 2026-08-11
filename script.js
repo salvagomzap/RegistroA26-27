@@ -242,12 +242,10 @@ async function crearTablaFija(id, total) {
   const conRonda = id === "tabla-jornadas-eliminatorias";
   const prefijo = prefijosFijos[id] || "J";
   
-  // 1. Creamos las filas vacías
   for (let i = 1; i <= total; i++) {
     crearFila(tbody, i, prefijo, conRonda);
   }
   
-  // 2. Cargamos los datos reales desde la nube inmediatamente después
   await cargarDatos(id);
   await actualizarResumen(id);
 }
@@ -437,7 +435,6 @@ async function renderizarTarjetasPanel() {
 }
 
 async function inicializarTablas() {
-  // Buscamos si hay una tabla en la página actual y cargamos sus datos específicos
   const cuerposTabla = document.querySelectorAll("tbody[id]");
   for (const tbody of cuerposTabla) {
     const id = tbody.id;
@@ -450,22 +447,30 @@ async function inicializarTablas() {
   await renderizarTarjetasPanel();
 }
 
-document.querySelectorAll("table").forEach(function (tabla) {
-  const tbody = tabla.querySelector("tbody");
-  if (!tbody || !tbody.id) return;
-  const id = tbody.id;
+/* =========================================================
+   GESTIÓN GLOBAL DE EVENTOS (CLICS Y CAMBIOS)
+========================================================= */
 
-  tabla.addEventListener("click", function (e) {
-    if (!e.target.classList.contains("guardar")) return;
+document.addEventListener("click", function (e) {
+  if (!e.target.classList.contains("guardar")) return;
+  
+  const fila = e.target.closest("tr");
+  const tbody = e.target.closest("tbody");
+  
+  if (!fila || !tbody || !tbody.id) {
+    alert("Error: No se encuentra la tabla o la fila.");
+    return;
+  }
+  
+  const tablaId = tbody.id;
+  guardarFila(tablaId, fila);
+});
+
+document.addEventListener("change", function (e) {
+  if (e.target.classList.contains("estado")) {
     const fila = e.target.closest("tr");
-    guardarFila(id, fila);
-  });
-
-  tabla.addEventListener("change", function (e) {
-    if (e.target.classList.contains("estado")) {
-      marcarFila(e.target.closest("tr"));
-    }
-  });
+    if (fila) marcarFila(fila);
+  }
 });
 
 document.querySelectorAll(".boton-principal[data-tabla]").forEach(function (boton) {
@@ -476,12 +481,5 @@ document.querySelectorAll(".boton-principal[data-tabla]").forEach(function (boto
     
     const nuevoNumero = tbody.querySelectorAll("tr").length + 1;
     crearFila(tbody, nuevoNumero, "P", false);
-    
-    const user = auth.currentUser;
-    if (user) {
-      const datos = await obtenerDatosTabla(id);
-      const docRef = doc(db, "usuarios", user.uid, "tablas", id);
-      await setDoc(docRef, { filas: datos }, { merge: true });
-    }
   });
 });
