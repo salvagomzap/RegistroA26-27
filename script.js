@@ -41,10 +41,10 @@ const tablasFijas = {
   "tabla-jornadas-premier": 38,
   "tabla-jornadas-grupos": 38,
   "tabla-jornadas-eliminatorias": 11,
+  "tabla-aumentos": 8,
   "tabla-tenis": 21,
   "tabla-nba": 17,
-  "tabla-partidos": 17,
-  "tabla-aumentos": 8
+  "tabla-partidos": 17
 };
 
 const prefijosFijos = {
@@ -443,7 +443,6 @@ async function renderizarTarjetasPanel() {
     contenedor.appendChild(card);
   }
 
-  // Actualiza la tarjeta superior con la suma de todos los retos en curso
   const elementoTotal = document.getElementById("total-dinero-curso");
   if (elementoTotal) {
     elementoTotal.textContent = formatoEuros(sumaTotalEnCurso);
@@ -462,10 +461,6 @@ async function inicializarTablas() {
   }
   await renderizarTarjetasPanel();
 }
-
-/* =========================================================
-   GESTIÓN GLOBAL DE EVENTOS (CLICS Y CAMBIOS)
-========================================================= */
 
 document.addEventListener("click", function (e) {
   if (!e.target.classList.contains("guardar")) return;

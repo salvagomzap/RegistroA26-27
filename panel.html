@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- MENÚ SUPERIOR -->
     <header class="cabecera">
         <div class="logo">
             APUESTAS 26/27
@@ -33,28 +32,25 @@
         <button type="button" class="cerrar-sesion">SALIR</button>
     </header>
 
-    <!-- CONTENIDO -->
-   <main class="principal">
-    <div class="encabezado-panel" style="display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;">
-        <img src="OIP.png" alt="bet365 Logo" class="logo-bet365" style="margin: 0;">
-        
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px 30px; border-radius: var(--radius-md); text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-            <h3 style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.5px;">Retos en curso (Total)</h3>
-            <div id="total-dinero-curso" style="font-size: 22px; font-weight: 700; color: var(--text-main);">0,00 €</div>
+    <main class="principal">
+        <div class="encabezado-panel" style="display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;">
+            <img src="OIP.png" alt="bet365 Logo" class="logo-bet365" style="margin: 0;">
+            
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px 30px; border-radius: var(--radius-md); text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                <h3 style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.5px;">Retos en curso (Total)</h3>
+                <div id="total-dinero-curso" style="font-size: 22px; font-weight: 700; color: var(--text-main);">0,00 €</div>
+            </div>
         </div>
-    </div>
 
-    <div style="text-align: center; margin-top: 10px; margin-bottom: 30px;">
-        <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 6px;">Mis retos</h1>
-        <p style="color: var(--text-muted); font-size: 14px;">Estado general y ganancias de todos los retos activos.</p>
-    </div>
+        <div style="text-align: center; margin-top: 10px; margin-bottom: 30px;">
+            <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 6px;">Mis retos</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Estado general y ganancias de todos los retos activos.</p>
+        </div>
         
         <div id="contenedor-tarjetas-retos" class="grid-retos">
-            <!-- Las tarjetas se generan dinámicamente con JS -->
         </div>
     </main>
 
-    <!-- Script con type="module" obligatorio -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
