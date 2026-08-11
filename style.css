@@ -499,32 +499,55 @@ button.guardar:hover,
 ========================================================= */
 
 @media screen and (max-width: 768px) {
-  /* Cabecera y menú superior desplazable en móvil */
+  /* Cabecera compacta en móvil */
   .cabecera {
+    display: flex;
     flex-direction: column;
+    align-items: center;
     padding: 10px;
     height: auto;
   }
 
+  .logo {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  /* Menú de retos en línea horizontal con scroll fluido */
   .menu-retos {
     display: flex;
+    flex-direction: row;
     overflow-x: auto;
     width: 100%;
     white-space: nowrap;
-    padding-bottom: 8px;
-    gap: 10px;
+    padding: 5px 0;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .menu-retos a {
     display: inline-block;
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 6px 12px;
+    font-size: 11px;
+    flex-shrink: 0;
   }
 
-  /* Ajuste del contenido principal y tarjetas de resumen */
+  /* Ajuste de usuario y botón salir para que no se monten */
+  .usuario-conectado {
+    font-size: 11px;
+    margin: 5px 0;
+    text-align: center;
+  }
+
+  .cerrar-sesion {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  /* Contenido principal y tarjetas de resumen */
   .principal {
     padding: 10px;
-    margin-top: 20px;
+    margin-top: 10px;
   }
 
   .resumen-reto {
@@ -532,7 +555,7 @@ button.guardar:hover,
     gap: 10px;
   }
 
-  /* Tablas con desplazamiento horizontal para que no se rompan */
+  /* Tablas con desplazamiento horizontal */
   .tabla-contenedor {
     width: 100%;
     overflow-x: auto;
@@ -543,7 +566,6 @@ button.guardar:hover,
     min-width: 600px;
   }
 
-  /* Reducir tamaño de inputs en móviles para que quepan mejor */
   table input[type="text"],
   table input[type="number"],
   table select {
@@ -551,13 +573,11 @@ button.guardar:hover,
     font-size: 12px;
   }
 
-  /* Ajuste de los botones de guardar */
   table button.guardar {
     padding: 5px 8px;
     font-size: 11px;
   }
 
-  /* Tarjetas del panel de inicio */
   #contenedor-tarjetas-retos {
     grid-template-columns: 1fr;
   }
