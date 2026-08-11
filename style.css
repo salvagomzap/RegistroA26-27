@@ -514,16 +514,15 @@ button.guardar:hover,
   }
 
   /* Menú de retos en línea horizontal con scroll fluido */
-  .menu-retos {
+.menu-retos {
     display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    width: 100%;
-    white-space: nowrap;
-    padding: 5px 0;
-    gap: 8px;
-    -webkit-overflow-scrolling: touch;
-  }
+    flex-wrap: wrap; /* Permite que los botones salten a la línea de abajo si no caben */
+    justify-content: center; /* Los centra elegantemente */
+    gap: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+    flex: 1;
+}
 
   .menu-retos a {
     display: inline-block;
@@ -581,4 +580,19 @@ button.guardar:hover,
   #contenedor-tarjetas-retos {
     grid-template-columns: 1fr;
   }
+  
+.cabecera {
+    width: 100%;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: auto; /* Se adapta automáticamente al contenido */
+}
 }
