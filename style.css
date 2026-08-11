@@ -493,3 +493,72 @@ button.guardar:hover,
     background-color: var(--bg-card);
     border-color: var(--border-color);
 }
+
+/* =========================================================
+   ADAPTACIÓN PARA MÓVILES (RESPONSIVE DESIGN)
+========================================================= */
+
+@media screen and (max-width: 768px) {
+  /* Cabecera y menú superior desplazable en móvil */
+  .cabecera {
+    flex-direction: column;
+    padding: 10px;
+    height: auto;
+  }
+
+  .menu-retos {
+    display: flex;
+    overflow-x: auto;
+    width: 100%;
+    white-space: nowrap;
+    padding-bottom: 8px;
+    gap: 10px;
+  }
+
+  .menu-retos a {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  /* Ajuste del contenido principal y tarjetas de resumen */
+  .principal {
+    padding: 10px;
+    margin-top: 20px;
+  }
+
+  .resumen-reto {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Tablas con desplazamiento horizontal para que no se rompan */
+  .tabla-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  /* Reducir tamaño de inputs en móviles para que quepan mejor */
+  table input[type="text"],
+  table input[type="number"],
+  table select {
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  /* Ajuste de los botones de guardar */
+  table button.guardar {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  /* Tarjetas del panel de inicio */
+  #contenedor-tarjetas-retos {
+    grid-template-columns: 1fr;
+  }
+}
