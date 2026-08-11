@@ -459,6 +459,14 @@ document.querySelectorAll("table").forEach(function (tabla) {
 });
 
 document.querySelectorAll(".boton-principal[data-tabla]").forEach(function (boton) {
+  boton.addEventListener("click", async function () {
+    const id = boton.dataset.tabla;
+    await anadirFilaAbierta(id);
+    await cargarDatos(id);
+  });
+});
+
+document.querySelectorAll(".boton-principal[data-tabla]").forEach(function (boton) {
   boton.addEventListener("click", function () {
     anadirFilaAbierta(boton.dataset.tabla);
   });
