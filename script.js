@@ -431,11 +431,15 @@ async function renderizarTarjetasPanel() {
 }
 
 async function inicializarTablas() {
-  for (const id of Object.keys(tablasFijas)) {
-    await crearTablaFija(id, tablasFijas[id]);
-  }
-  for (const id of tablasAbiertas) {
-    await crearTablaAbierta(id);
+  // Buscamos si hay una tabla en la página actual y cargamos sus datos específicos
+  const cuerposTabla = document.querySelectorAll("tbody[id]");
+  for (const tbody of cuerposTabla) {
+    const id = tbody.id;
+    if (tablasFijas[id]) {
+      await crearTablaFija(id, tablasFijas[id]);
+    } else if (tablasAbiertas.includes(id)) {
+      await crearTablaAbierta(id);
+    }
   }
   await renderizarTarjetasPanel();
 }
