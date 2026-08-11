@@ -1,14 +1,42 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc 
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+/* =========================================================
+   CONFIGURACIÓN Y INICIALIZACIÓN DE FIREBASE
+========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCnpkG7CpWhUJBabiirGpTbVm2Q3maK2Bw",
+  authDomain: "registro-apuestas-6bec2.firebaseapp.com",
+  projectId: "registro-apuestas-6bec2",
+  storageBucket: "registro-apuestas-6bec2.firebasestorage.app",
+  messagingSenderId: "568936374678",
+  appId: "1:568936374678:web:f2e51ba5055cb3c837bdb7",
+  measurementId: "G-7FNS9FJ4PL"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 document.addEventListener("DOMContentLoaded", function () {
 
   /* =========================================================
      CONFIGURACIÓN GENERAL
   ========================================================= */
-  const STORAGE_PREFIX = "tabla_apuestas_";
-  const USERS_KEY = "usuarios_registrados";
-  const SESSION_KEY = "sesion_actual";
   const rondas = ["Dieciseisavos", "Octavos", "Cuartos", "Semifinal", "Final"];
 
-  // Tablas de tamaño fijo: id del tbody -> número total de filas
   const tablasFijas = {
     "tabla-jornadas": 38,
     "tabla-jornadas-madrid": 38,
@@ -23,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
     "tabla-partidos": 17
   };
 
-  // Prefijo de cada fila según la tabla (por defecto "J")
   const prefijosFijos = {
     "tabla-jornadas-eliminatorias": "E",
     "tabla-tenis": "P",
@@ -31,96 +58,132 @@ document.addEventListener("DOMContentLoaded", function () {
     "tabla-partidos": "P"
   };
 
-  // Tablas abiertas: se van añadiendo filas con el botón "+ Añadir partido"
   const tablasAbiertas = ["tabla-apuestas1"];
-  // Filas con las que empieza cada tabla abierta si el usuario nunca ha tocado nada
   const filasInicialesAbiertas = { "tabla-apuestas1": 2 };
 
   /* =========================================================
-     USUARIOS / SESIÓN (simulado en el navegador, sin servidor)
+     AUTENTICACIÓN Y SESIÓN EN LA NUBE (FIREBASE AUTH)
   ========================================================= */
-  function obtenerUsuarios() {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-  }
-  function guardarUsuarios(lista) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(lista));
-  }
-  function registrarUsuario(usuario, password) {
-    const usuarios = obtenerUsuarios();
-    const yaExiste = usuarios.some(function (u) {
-      return u.usuario.toLowerCase() === usuario.toLowerCase();
-    });
-    if (yaExiste) return { ok: false, mensaje: "Ese usuario ya existe." };
-    usuarios.push({ usuario: usuario, password: password });
-    guardarUsuarios(usuarios);
-    return { ok: true };
-  }
-  function iniciarSesion(usuario, password) {
-    const usuarios = obtenerUsuarios();
-    const encontrado = usuarios.find(function (u) {
-      return u.usuario.toLowerCase() === usuario.toLowerCase() && u.password === password;
-    });
-    if (!encontrado) return { ok: false, mensaje: "Usuario o contraseña incorrectos." };
-    localStorage.setItem(SESSION_KEY, encontrado.usuario);
-    return { ok: true };
-  }
-  function cerrarSesion() {
-    localStorage.removeItem(SESSION_KEY);
-  }
-  function sesionActiva() {
-    return localStorage.getItem(SESSION_KEY);
-  }
-  // Clave de almacenamiento única para cada usuario + tabla
-  function claveAlmacen(id) {
-    const usuario = sesionActiva() || "invitado";
-    return STORAGE_PREFIX + usuario + "_" + id;
-  }
+  
+  // Escucha cambios de estado de autenticación globales
+  onAuthStateChanged(auth, async (user) => {
+    const cabecera = document.querySelector(".cabecera");
+    const esPaginaPublica = window.location.pathname.endsWith("login.html") || 
+                            window.location.pathname.endsWith("registro.html") || 
+                            window.location.pathname.endsWith("index.html") ||
+                            window.location.pathname === "/" || window.location.pathname === "";
+
+    if (user) {
+      if (cabecera) {
+        const usuarioEl = document.getElementById("usuario-conectado");
+        if (usuarioEl) usuarioEl.textContent = "Hola, " + user.email;
+        const salir = document.querySelector(".cerrar-sesion");
+        if (salir) {
+          salir.onclick = () => signOut(auth).then(() => location.href = "login.html");
+        }
+      }
+      // Inicializar tablas una vez verificado el usuario
+      await inicializarTablas();
+    } else {
+      if (cabecera && !esPaginaPublica) {
+        location.href = "login.html";
+      }
+    }
+  });
 
   /* ---- Botones de la portada (index.html) ---- */
   const btnLogin = document.getElementById("btnLogin");
   const btnRegistro = document.getElementById("btnRegistro");
-  if (btnLogin) btnLogin.addEventListener("click", function () { location.href = "login.html"; });
-  if (btnRegistro) btnRegistro.addEventListener("click", function () { location.href = "registro.html"; });
+  if (btnLogin) btnLogin.addEventListener("click", () => { location.href = "login.html"; });
+  if (btnRegistro) btnRegistro.addEventListener("click", () => { location.href = "registro.html"; });
 
   /* ---- Formulario de registro ---- */
   const formRegistro = document.getElementById("form-registro");
   if (formRegistro) {
-    formRegistro.addEventListener("submit", function (e) {
+    formRegistro.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const usuario = document.getElementById("usuario").value.trim();
+      const email = document.getElementById("usuario").value.trim();
       const password = document.getElementById("password").value;
-      if (!usuario || !password) { alert("Rellena usuario y contraseña."); return; }
-      const resultado = registrarUsuario(usuario, password);
-      if (!resultado.ok) { alert(resultado.mensaje); return; }
-      alert("Cuenta creada. Ahora inicia sesión.");
-      location.href = "login.html";
+      if (!email || !password) { alert("Rellena correo y contraseña."); return; }
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Cuenta creada con éxito.");
+        location.href = "panel.html";
+      } catch (error) {
+        alert("Error al registrar: " + error.message);
+      }
     });
   }
 
   /* ---- Formulario de login ---- */
   const formLogin = document.getElementById("form-login");
   if (formLogin) {
-    formLogin.addEventListener("submit", function (e) {
+    formLogin.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const usuario = document.getElementById("usuario").value.trim();
+      const email = document.getElementById("usuario").value.trim();
       const password = document.getElementById("password").value;
-      const resultado = iniciarSesion(usuario, password);
-      if (!resultado.ok) { alert(resultado.mensaje); return; }
-      location.href = "panel.html";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        location.href = "panel.html";
+      } catch (error) {
+        alert("Usuario o contraseña incorrectos.");
+      }
     });
   }
 
-  /* ---- Protección de páginas internas (todas las que tienen cabecera) ---- */
-  const cabecera = document.querySelector(".cabecera");
-  if (cabecera) {
-    if (!sesionActiva()) {
-      location.href = "login.html";
-      return;
+  /* =========================================================
+     GESTIÓN DE FIRESTORE (BASE DE DATOS EN LA NUBE)
+  ========================================================= */
+
+  // Obtener los datos almacenados de una tabla para el usuario activo
+  async function obtenerDatosTabla(tablaId) {
+    const user = auth.currentUser;
+    if (!user) return {};
+    try {
+      const docRef = doc(db, "usuarios", user.uid, "tablas", tablaId);
+      const docSnap = await getDoc(docRef);
+      return docSnap.exists() ? docSnap.data().filas || {} : {};
+    } catch (e) {
+      console.error("Error cargando datos de Firestore:", e);
+      return {};
     }
-    const usuarioEl = document.getElementById("usuario-conectado");
-    if (usuarioEl) usuarioEl.textContent = "Hola, " + sesionActiva();
-    const salir = document.querySelector(".cerrar-sesion");
-    if (salir) salir.addEventListener("click", function () { cerrarSesion(); });
+  }
+
+  // Guardar una fila individual en Firestore
+  async function guardarFila(tablaId, fila) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const datos = await obtenerDatosTabla(tablaId);
+    const numero = fila.dataset.fila;
+
+    const apuesta = fila.querySelector(".apuesta");
+    const cuota = fila.querySelector(".cuota");
+    const dinero = fila.querySelector(".dinero-apostado");
+    const obtenido = fila.querySelector(".dinero-obtenido");
+    const estado = fila.querySelector(".estado");
+    const ronda = fila.querySelector(".ronda");
+
+    datos[numero] = {
+      apuesta: apuesta ? apuesta.value : "",
+      cuota: cuota ? cuota.value : "",
+      dinero: dinero ? dinero.value : "",
+      obtenido: obtenido ? obtenido.value : "",
+      estado: estado ? estado.value : "PENDIENTE",
+      ronda: ronda ? ronda.value : ""
+    };
+
+    try {
+      const docRef = doc(db, "usuarios", user.uid, "tablas", tablaId);
+      await setDoc(docRef, { filas: datos }, { merge: true });
+      marcarFila(fila);
+      await actualizarResumen(tablaId);
+      alert("Fila guardada en la nube.");
+    } catch (e) {
+      alert("Error al guardar en la nube: " + e.message);
+    }
   }
 
   /* =========================================================
@@ -145,47 +208,45 @@ document.addEventListener("DOMContentLoaded", function () {
     tbody.appendChild(tr);
   }
 
-  function crearTablaFija(id, total) {
+  async function crearTablaFija(id, total) {
     const tbody = document.getElementById(id);
     if (!tbody) return;
     tbody.innerHTML = "";
     const conRonda = id === "tabla-jornadas-eliminatorias";
     const prefijo = prefijosFijos[id] || "J";
     for (let i = 1; i <= total; i++) crearFila(tbody, i, prefijo, conRonda);
-    cargarDatos(id);
-    actualizarResumen(id);
+    await cargarDatos(id);
+    await actualizarResumen(id);
   }
 
-  function contarFilasAbiertas(id) {
-    const valor = localStorage.getItem(claveAlmacen(id) + "_count");
-    if (valor !== null) return parseInt(valor, 10);
-    return filasInicialesAbiertas[id] || 0;
+  async function contarFilasAbiertas(id) {
+    const datos = await obtenerDatosTabla(id);
+    const numGuardadas = Object.keys(datos).length;
+    return Math.max(numGuardadas, filasInicialesAbiertas[id] || 0);
   }
-  function guardarContadorAbiertas(id, n) {
-    localStorage.setItem(claveAlmacen(id) + "_count", String(n));
-  }
-  function crearTablaAbierta(id) {
+
+  async function crearTablaAbierta(id) {
     const tbody = document.getElementById(id);
     if (!tbody) return;
     tbody.innerHTML = "";
-    const total = contarFilasAbiertas(id);
+    const total = await contarFilasAbiertas(id);
     for (let i = 1; i <= total; i++) crearFila(tbody, i, "P", false);
-    cargarDatos(id);
-    actualizarResumen(id);
-  }
-  function anadirFilaAbierta(id) {
-    const tbody = document.getElementById(id);
-    if (!tbody) return;
-    const nuevoNumero = contarFilasAbiertas(id) + 1;
-    guardarContadorAbiertas(id, nuevoNumero);
-    crearFila(tbody, nuevoNumero, "P", false);
-    actualizarResumen(id);
+    await cargarDatos(id);
+    await actualizarResumen(id);
   }
 
-  function cargarDatos(id) {
+  async function anadirFilaAbierta(id) {
     const tbody = document.getElementById(id);
     if (!tbody) return;
-    const datos = JSON.parse(localStorage.getItem(claveAlmacen(id)) || "{}");
+    const totalActual = tbody.querySelectorAll("tr").length;
+    const nuevoNumero = totalActual + 1;
+    crearFila(tbody, nuevoNumero, "P", false);
+  }
+
+  async function cargarDatos(id) {
+    const tbody = document.getElementById(id);
+    if (!tbody) return;
+    const datos = await obtenerDatosTabla(id);
     tbody.querySelectorAll("tr").forEach(function (fila) {
       const numero = fila.dataset.fila;
       if (!datos[numero]) return;
@@ -196,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const obtenido = fila.querySelector(".dinero-obtenido");
       const estado = fila.querySelector(".estado");
       const ronda = fila.querySelector(".ronda");
+
       if (apuesta) apuesta.value = d.apuesta || "";
       if (cuota) cuota.value = d.cuota || "";
       if (dinero) dinero.value = d.dinero || "";
@@ -206,27 +268,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function guardarFila(id, fila) {
-    const datos = JSON.parse(localStorage.getItem(claveAlmacen(id)) || "{}");
-    const apuesta = fila.querySelector(".apuesta");
-    const cuota = fila.querySelector(".cuota");
-    const dinero = fila.querySelector(".dinero-apostado");
-    const obtenido = fila.querySelector(".dinero-obtenido");
-    const estado = fila.querySelector(".estado");
-    const ronda = fila.querySelector(".ronda");
-    datos[fila.dataset.fila] = {
-      apuesta: apuesta ? apuesta.value : "",
-      cuota: cuota ? cuota.value : "",
-      dinero: dinero ? dinero.value : "",
-      obtenido: obtenido ? obtenido.value : "",
-      estado: estado ? estado.value : "PENDIENTE",
-      ronda: ronda ? ronda.value : ""
-    };
-    localStorage.setItem(claveAlmacen(id), JSON.stringify(datos));
-    marcarFila(fila);
-    actualizarResumen(id);
-  }
-
   function marcarFila(fila) {
     const estado = fila.querySelector(".estado") ? fila.querySelector(".estado").value : "";
     fila.classList.remove("fila-ganada", "fila-perdida");
@@ -235,27 +276,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* =========================================================
-     TARJETAS RESUMEN (Cálculos automáticos)
+     TARJETAS RESUMEN
   ========================================================= */
   function formatoEuros(valor) {
     return (parseFloat(valor) || 0).toFixed(2).replace(".", ",") + " €";
   }
+
   function estadoResumen(estado) {
     if (estado === "GANADA") return "EN CURSO";
     if (estado === "PERDIDA") return "PERDIDA";
     return "PENDIENTE";
   }
 
-  function actualizarResumen(id) {
+  async function actualizarResumen(id) {
     const resumen = document.querySelector(".resumen-reto");
     if (!resumen) return;
     const celdas = resumen.querySelectorAll(".numero");
     if (celdas.length < 4) return;
     
-    const datos = JSON.parse(localStorage.getItem(claveAlmacen(id)) || "{}");
-    const numeros = Object.keys(datos).map(Number).filter(function (n) { return !isNaN(n); }).sort(function (a, b) { return a - b; });
+    const datos = await obtenerDatosTabla(id);
+    const numeros = Object.keys(datos).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
 
-    /* Lógica para APUESTAS 1€ (Acumulativa) */
     if (id === "tabla-apuestas1") {
       let totalApostado = 0;
       let totalObtenido = 0;
@@ -266,9 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const obtenido = parseFloat(fila.obtenido) || 0;
 
         totalApostado += apostado;
-        if (fila.estado === "GANADA") {
-          totalObtenido += obtenido;
-        }
+        if (fila.estado === "GANADA") totalObtenido += obtenido;
       });
 
       celdas[0].textContent = String(numeros.length);
@@ -278,9 +317,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    /* Lógica para el resto de Retos de Reinversión */
     const total = tablasFijas[id];
-    
     if (numeros.length === 0) {
       celdas[0].textContent = total ? ("0 / " + total) : "0";
       celdas[1].textContent = formatoEuros(1);
@@ -314,16 +351,16 @@ document.addEventListener("DOMContentLoaded", function () {
     { id: "tabla-apuestas1", nombre: "APUESTAS 1€", enlace: "apuestas1.html" }
   ];
 
-  function renderizarTarjetasPanel() {
+  async function renderizarTarjetasPanel() {
     const contenedor = document.getElementById("contenedor-tarjetas-retos");
     if (!contenedor) return;
 
     contenedor.innerHTML = "";
 
-    listaRetosPanel.forEach(function (reto) {
+    for (const reto of listaRetosPanel) {
       const totalFilas = tablasFijas[reto.id] || 1;
-      const datos = JSON.parse(localStorage.getItem(claveAlmacen(reto.id)) || "{}");
-      const numeros = Object.keys(datos).map(Number).filter(function (n) { return !isNaN(n); }).sort(function (a, b) { return a - b; });
+      const datos = await obtenerDatosTabla(reto.id);
+      const numeros = Object.keys(datos).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
 
       let estadoFila = "EN CURSO";
       let claseEstado = "reto-en-curso";
@@ -332,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (numeros.length > 0) {
         if (reto.id === "tabla-apuestas1") {
           let totalObtenido = 0;
-          numeros.forEach(function (n) {
+          numeros.forEach(n => {
             if (datos[n].estado === "GANADA") totalObtenido += (parseFloat(datos[n].obtenido) || 0);
           });
           estadoFila = "EN CURSO";
@@ -369,21 +406,21 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
       `;
       contenedor.appendChild(card);
-    });
+    }
   }
 
   /* =========================================================
-     INICIALIZACIÓN DE TABLAS EN LA PÁGINA ACTUAL
+     INICIALIZACIÓN DE TABLAS
   ========================================================= */
-  Object.keys(tablasFijas).forEach(function (id) {
-    crearTablaFija(id, tablasFijas[id]);
-  });
-  tablasAbiertas.forEach(function (id) {
-    crearTablaAbierta(id);
-  });
-
-  // Ejecuta la renderización de las tarjetas si estamos en panel.html
-  renderizarTarjetasPanel();
+  async function inicializarTablas() {
+    for (const id of Object.keys(tablasFijas)) {
+      await crearTablaFija(id, tablasFijas[id]);
+    }
+    for (const id of tablasAbiertas) {
+      await crearTablaAbierta(id);
+    }
+    await renderizarTarjetasPanel();
+  }
 
   /* ---- Eventos de las tablas (guardar / cambio de estado) ---- */
   document.querySelectorAll("table").forEach(function (tabla) {
