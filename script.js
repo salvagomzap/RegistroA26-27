@@ -14,7 +14,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 /* =========================================================
-   CONFIGURACIÓN Y INICIALIZACIÓN DE FIREBASE
+   CONFIGURACIÓN E INICIALIZACIÓN DE FIREBASE
 ========================================================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCnpkG7CpWhUJBabiirGpTbVm2Q3maK2Bw",
@@ -65,13 +65,12 @@ document.addEventListener("DOMContentLoaded", function () {
      AUTENTICACIÓN Y SESIÓN EN LA NUBE (FIREBASE AUTH)
   ========================================================= */
   
-  // Escucha cambios de estado de autenticación globales
   onAuthStateChanged(auth, async (user) => {
     const cabecera = document.querySelector(".cabecera");
-    const esPaginaPublica = window.location.pathname.endsWith("login.html") || 
-                            window.location.pathname.endsWith("registro.html") || 
-                            window.location.pathname.endsWith("index.html") ||
-                            window.location.pathname === "/" || window.location.pathname === "";
+    const esPaginaLoginOAcceso = window.location.pathname.endsWith("login.html") || 
+                                 window.location.pathname.endsWith("registro.html") || 
+                                 window.location.pathname.endsWith("index.html") ||
+                                 window.location.pathname === "/" || window.location.pathname === "";
 
     if (user) {
       if (cabecera) {
@@ -82,10 +81,15 @@ document.addEventListener("DOMContentLoaded", function () {
           salir.onclick = () => signOut(auth).then(() => location.href = "login.html");
         }
       }
-      // Inicializar tablas una vez verificado el usuario
+      
+      // Si el usuario ya está autenticado e intenta ir a login/registro/index, lo manda al panel
+      if (esPaginaLoginOAcceso && !window.location.pathname.endsWith("index.html")) {
+        location.href = "panel.html";
+      }
+
       await inicializarTablas();
     } else {
-      if (cabecera && !esPaginaPublica) {
+      if (cabecera && !esPaginaLoginOAcceso) {
         location.href = "login.html";
       }
     }
@@ -97,13 +101,15 @@ document.addEventListener("DOMContentLoaded", function () {
   if (btnLogin) btnLogin.addEventListener("click", () => { location.href = "login.html"; });
   if (btnRegistro) btnRegistro.addEventListener("click", () => { location.href = "registro.html"; });
 
-  /* ---- Formulario de registro ---- */
+  /* ---- Formulario de registro (registro.html) ---- */
   const formRegistro = document.getElementById("form-registro");
   if (formRegistro) {
     formRegistro.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const email = document.getElementById("usuario").value.trim();
+      const inputUser = document.getElementById("usuario") || document.getElementById("email");
+      const email = inputUser ? inputUser.value.trim() : "";
       const password = document.getElementById("password").value;
+
       if (!email || !password) { alert("Rellena correo y contraseña."); return; }
 
       try {
@@ -111,33 +117,53 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("Cuenta creada con éxito.");
         location.href = "panel.html";
       } catch (error) {
-        alert("Error al registrar: " + error.message);
+        alert("Error al registrar: " + traducirErrorFirebase(error.code));
       }
     });
   }
 
-  /* ---- Formulario de login ---- */
+  /* ---- Formulario de login (login.html) ---- */
   const formLogin = document.getElementById("form-login");
   if (formLogin) {
     formLogin.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const email = document.getElementById("usuario").value.trim();
+      const inputUser = document.getElementById("usuario") || document.getElementById("email");
+      const email = inputUser ? inputUser.value.trim() : "";
       const password = document.getElementById("password").value;
+
+      if (!email || !password) { alert("Introduce tu usuario/correo y contraseña."); return; }
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
         location.href = "panel.html";
       } catch (error) {
-        alert("Usuario o contraseña incorrectos.");
+        alert("Error al iniciar sesión: " + traducirErrorFirebase(error.code));
       }
     });
+  }
+
+  // Traductor de errores de Firebase a mensajes claros
+  function traducirErrorFirebase(codigo) {
+    switch (codigo) {
+      case "auth/invalid-email":
+        return "El formato del correo electrónico no es válido (ejemplo: usuario@email.com).";
+      case "auth/user-not-found":
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        return "Usuario o contraseña incorrectos.";
+      case "auth/email-already-in-use":
+        return "Este correo ya está registrado.";
+      case "auth/weak-password":
+        return "La contraseña debe tener al menos 6 caracteres.";
+      default:
+        return "Ocurrió un error. Comprueba tus datos.";
+    }
   }
 
   /* =========================================================
      GESTIÓN DE FIRESTORE (BASE DE DATOS EN LA NUBE)
   ========================================================= */
 
-  // Obtener los datos almacenados de una tabla para el usuario activo
   async function obtenerDatosTabla(tablaId) {
     const user = auth.currentUser;
     if (!user) return {};
@@ -151,7 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Guardar una fila individual en Firestore
   async function guardarFila(tablaId, fila) {
     const user = auth.currentUser;
     if (!user) return;
