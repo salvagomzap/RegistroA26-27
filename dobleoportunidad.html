@@ -3,97 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reto Doble Oportunidad</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Doble Oportunidad - Retos</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header class="cabecera">
+        <div class="logo">APUESTAS 26/27</div>
+        <nav class="menu-retos">
+            <a href="panel.html">INICIO</a>
+            <a href="barcelona.html">FC BARCELONA</a>
+            <a href="madrid.html">REAL MADRID</a>
+            <a href="betis.html">REAL BETIS</a>
+            <a href="bayern.html">BAYERN MUNICH</a>
+            <a href="laliga.html">LA LIGA</a>
+            <a href="premier.html">PREMIER LEAGUE</a>
+            <a href="gruposchampions.html">FASE GRUPOS CHAMPIONS</a>
+            <a href="eliminatoriaschampions.html">ELIMINATORIAS CHAMPIONS</a>
+            <a href="aumentos.html">RETO AUMENTOS</a>
+            <a href="dobleoportunidad.html" class="activo">DOBLE OPORTUNIDAD</a>
+            <a href="tenis.html">TENIS</a>
+            <a href="nba.html">PLAY OFF NBA</a>
+            <a href="partidos.html">PARTIDOS ESPECIALES</a>
+            <a href="apuestas1.html">APUESTAS 1€</a>
+        </nav>
+        <span class="usuario-conectado" id="usuario-conectado"></span>
+        <button type="button" class="cerrar-sesion">SALIR</button>
+    </header>
 
-    <!-- MENÚ DE NAVEGACIÓN -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="panel.html">Panel Principal</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="barcelona.html">Barcelona</a></li>
-                    <li class="nav-item"><a class="nav-link" href="madrid.html">Real Madrid</a></li>
-                    <li class="nav-item"><a class="nav-link" href="betis.html">Betis</a></li>
-                    <li class="nav-item"><a class="nav-link" href="bayern.html">Bayern</a></li>
-                    <li class="nav-item"><a class="nav-link" href="laliga.html">LaLiga</a></li>
-                    <li class="nav-item"><a class="nav-link" href="premier.html">Premier League</a></li>
-                    <li class="nav-item"><a class="nav-link" href="gruposchampions.html">Grupos Champions</a></li>
-                    <li class="nav-item"><a class="nav-link" href="eliminatoriaschampions.html">Eliminatorias Champions</a></li>
-                    <li class="nav-item"><a class="nav-link" href="aumentos.html">Reto Aumentos</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="dobleoportunidad.html">Doble Oportunidad</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tenis.html">Tenis</a></li>
-                    <li class="nav-item"><a class="nav-link" href="nba.html">NBA</a></li>
-                    <li class="nav-item"><a class="nav-link" href="partidos.html">Partidos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="apuestas1.html">Apuestas 1</a></li>
-                </ul>
+    <main class="principal">
+        <div class="titulo-reto">
+            <h1>DOBLE OPORTUNIDAD</h1>
+            <p>Reto de reinversión</p>
+        </div>
+
+        <section class="resumen-reto">
+            <div class="tarjeta">
+                <h3>Jornada actual</h3>
+                <p class="numero">0 / 38</p>
             </div>
-        </div>
-    </nav>
+            <div class="tarjeta">
+                <h3>Dinero apostado</h3>
+                <p class="numero">0,00 €</p>
+            </div>
+            <div class="tarjeta">
+                <h3>Dinero obtenido</h3>
+                <p class="numero">0,00 €</p>
+            </div>
+            <div class="tarjeta">
+                <h3>Estado</h3>
+                <p class="numero">PENDIENTE</p>
+            </div>
+        </section>
 
-    <!-- CONTENIDO PRINCIPAL DEL RETO -->
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">Reto Doble Oportunidad</h2>
-
-        <!-- Formulario para añadir apuestas (igual que betis) -->
-        <div class="card p-3 mb-4 shadow-sm">
-            <h4>Añadir Nueva Apuesta</h4>
-            <form id="form-apuesta">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">Fecha</label>
-                        <input type="date" id="fecha" class="form-control" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Partido / Evento</label>
-                        <input type="text" id="partido" class="form-control" placeholder="Ej: Equipo A vs Equipo B" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Cuota</label>
-                        <input type="number" step="0.01" id="cuota" class="form-control" placeholder="1.50" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Stake / Importe</label>
-                        <input type="number" step="0.01" id="stake" class="form-control" placeholder="10" required>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Guardar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Tabla de registros -->
-        <div class="card p-3 shadow-sm">
-            <h4>Historial de Apuestas</h4>
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
+        <section class="seccion">
+            <div class="cabecera-tabla">
+                <h2>Jornadas del reto</h2>
+            </div>
+            <div class="tabla-contenedor">
+                <table>
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Partido</th>
+                            <th>Jornada</th>
+                            <th>Apuesta</th>
                             <th>Cuota</th>
-                            <th>Stake</th>
+                            <th>Dinero apostado</th>
+                            <th>Dinero obtenido</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
-                    <tbody id="tabla-apuestas">
-                        <!-- Los datos se cargan dinámicamente con JavaScript -->
+                    <tbody id="tabla-jornadas">
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
