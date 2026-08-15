@@ -42,6 +42,7 @@ const tablasFijas = {
   "tabla-jornadas-grupos": 38,
   "tabla-jornadas-eliminatorias": 11,
   "tabla-aumentos": 8,
+  "tabla-jornadas-dobleoportunidad": 38, // <-- ¡Añadido para Doble Oportunidad!
   "tabla-tenis": 21,
   "tabla-nba": 17,
   "tabla-partidos": 17
@@ -372,6 +373,7 @@ const listaRetosPanel = [
   { id: "tabla-jornadas-grupos", nombre: "FASE GRUPOS CHAMPIONS", enlace: "gruposchampions.html" },
   { id: "tabla-jornadas-eliminatorias", nombre: "ELIMINATORIAS CHAMPIONS", enlace: "eliminatoriaschampions.html" },
   { id: "tabla-aumentos", nombre: "RETO AUMENTOS", enlace: "aumentos.html" },
+  { id: "tabla-jornadas-dobleoportunidad", nombre: "DOBLE OPORTUNIDAD", enlace: "dobleoportunidad.html" }, // <-- ¡Añadido para el panel!
   { id: "tabla-tenis", nombre: "TENIS", enlace: "tenis.html" },
   { id: "tabla-nba", nombre: "PLAY OFF NBA", enlace: "nba.html" },
   { id: "tabla-partidos", nombre: "PARTIDOS ESPECIALES", enlace: "partidos.html" },
